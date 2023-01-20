@@ -21,7 +21,8 @@ def main(template, input_image):
     cv.imshow("mask_template", mask_template)
 
     # creating mask of input image
-    mask_input_image = cv.adaptiveThreshold(input_image, 255, cv.ADAPTIVE_THRESH_GUASSIAN_C, cv.THRESH_BINARY, 50, 5)
+    # mask_input_image = cv.adaptiveThreshold(input_image, 255, cv.ADAPTIVE_THRESH_GUASSIAN_C, cv.THRESH_BINARY, 50, 5)
+    _, mask_input_image = cv.threshold(input_image, 10, 255, cv.THRESH_BINARY)
     cv.imshow("mask_input_image", mask_input_image)
 
     # kernel for morphology
@@ -36,7 +37,7 @@ def main(template, input_image):
     cv.imshow("dilated_mask_input_image", dilated_masked_input_image)
 
     # contours of input image
-    _, contours_input_image, hierarchy = cv.findContours(dilated_masked_input_image, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    contours_input_image, hierarchy = cv.findContours(dilated_masked_input_image, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
     
     x, y, w, h = cv.boundingRect(contours_input_image[1])
 
@@ -56,7 +57,7 @@ def main(template, input_image):
     cv.imshow("modified input image", modified_input_image)
 
     # contours of template image
-    _, contours_template, hierarchy = cv.findContours(dilated_masked_template, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    contours_template, hierarchy = cv.findContours(dilated_masked_template, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
 
     x, y, w, h = cv.boundingRect(contours_template[1])
     
@@ -77,11 +78,11 @@ def main(template, input_image):
     cv.imshow("reference image", reference_image)
 
     # contours of reference image
-    _, contours_reference_image, hierarchy = cv.findContours(reference_image, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    contours_reference_image, hierarchy = cv.findContours(reference_image, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
     print("area in reference image", cv.contourArea(contours_reference_image[1])) 
 
     # contours of modified template
-    _, contours_modified_template, hierarchy = cv.findContours(blank_image, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    contours_modified_template, hierarchy = cv.findContours(blank_image, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
     print("area in modified template", cv.contourArea(contours_modified_template[1]))
 
     # print(contours_reference_image[1])
@@ -100,14 +101,17 @@ def main(template, input_image):
     x = cv.contourArea(contours_reference_image[1])
     y = cv.contourArea(contours_modified_template[1])
 
-    threshold = ((x-y)/y)
-    print(threshold)
-    # comparing area of template & reference image; True if characters have same area
-    if threshold < 0.2:
-        print('char detected') 
+    # threshold = ((x-y)/y)
+    # print(threshold)
+    # # comparing area of template & reference image; True if characters have same area
+    # if threshold < 0.2:
+    #     print('char detected') 
 
-    else :
-        print('char not detected')
+    # else :
+    #     print('char not detected')
+
+    xor_output = cv.bitwise_xor(modified_input_image, blank_image)
+    cv.imshow("xor_output", xor_output) 
 
     # result =     
     cv.waitKey(0)
@@ -124,4 +128,4 @@ if __name__ == "__main__":
     #         print("template : {}; input images : {}".format(template, input_images))
     #         main(template, input_images)
     # 
-    main("templateImages/G.jpg", "inputImage/A2.jpg")                                                                                                                                                   
+    main("templates/G.jpg", "inputImage/A2.jpg")                                                                                                                                                   

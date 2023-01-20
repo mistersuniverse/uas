@@ -45,26 +45,35 @@ def main(template, input_image):
         pass
 
     contours, _ = cv.findContours(mask_input_image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    x, y, w, h = cv.boundingRect(contours[1])
 
     if len(contours) > 10:
-        pass
+        mask_input_image = cv.GaussianBlur(input_image, (55, 55), 0)
+        cv.imshow("input image 1", mask_input_image)
+
+        #
+        if mask_input_image[0, 0] == 0:
+            mask_input_image = cv.bitwise_not(mask_input_image)
+            cv.imshow("reverse", mask_input_image)
+
+        else :
+            pass
+
+        contours, _ = cv.findContours(mask_input_image, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+        x, y, w, h = cv.boundingRect(contours[0])
 
     else :
         pass
     
-    x, y, w, h = cv.boundingRect(contours[1])
     mask_input_image = mask_input_image[(y-5): (y+h+5), (x-5): (x+w+5)]
     cv.imshow("modified input image", mask_input_image)
 
-    # morphology in input image
-    eroded_masked_input_image = cv.erode(mask_input_image, kernel, iterations=1)
-    cv.imshow("dilated_mask_input_image", eroded_masked_input_image)
-
-    print(eroded_masked_input_image.shape, mask_template.shape)
-
     x, y = mask_template.shape
-    mask_input_image = cv.resize(mask_input_image, (y, x))
 
+    mask_input_image = cv.resize(mask_input_image, (y, x))
+    # mask_input_image = cv.GaussianBlur(mask_input_image, (55, 55), 0)
+
+    # cv.imshow("a", eroded_masked_input_image)
     cv.imshow("b", mask_template)
     cv.imshow("c", mask_input_image)
     # xor test
@@ -73,7 +82,7 @@ def main(template, input_image):
 
     # xor test
     no_of_white_pixels = np.sum(xor_output == 255)
-
+    print(no_of_white_pixels)
     xor_test = True
     threshold = 2000
 
@@ -104,4 +113,4 @@ def main(template, input_image):
     cv.destroyAllWindows()
 
 if __name__ == "__main__":
-    main("templates/A.jpg", "inputImage/H1.jpg")
+    main("templates/A.jpg", "inputImage/A2.jpg")
